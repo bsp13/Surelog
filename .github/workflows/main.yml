@@ -205,3 +205,26 @@ jobs:
         make test_install
         make test/unittest
         make regression
+
+        echo "***************************************************"
+        cat %GITHUB_WORKSPACE%/build/tests/ClassCons/ClassCons.log
+        echo "***************************************************"
+        cat %GITHUB_WORKSPACE%/build/tests/DiffSimpleIncludeAndMacros/DiffSimpleIncludeAndMacros.log
+        echo "***************************************************"
+        cat %GITHUB_WORKSPACE%/build/tests/DiffSimpleIncludeAndMacros/DiffSimpleIncludeAndMacros.log
+        echo "***************************************************"
+        cat %GITHUB_WORKSPACE%/build/tests/SimpleParserTestCache/SimpleParserTestCache.log
+        echo "***************************************************"
+        cat %GITHUB_WORKSPACE%/build/tests/UVMNestedSeq/UVMNestedSeq.log
+        echo "***************************************************"
+        cat %GITHUB_WORKSPACE%/build/tests/YosysCam/YosysCam.log
+        echo "***************************************************"
+        cat %GITHUB_WORKSPACE%/build/tests/YosysDsp/YosysDsp.log
+        echo "***************************************************"
+        cat %GITHUB_WORKSPACE%/build/tests/YosysEth/YosysEth.log
+        echo "***************************************************"
+        cat %GITHUB_WORKSPACE%/build/tests/YosysMarlann/YosysMarlann.log
+        echo "***************************************************"
+        cat %GITHUB_WORKSPACE%/build/tests/YosysRiscv/YosysRiscv.log
+        echo "***************************************************"
+        cat %GITHUB_WORKSPACE%/build/tests/YosysVerx/YosysVerx.log
