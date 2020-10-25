@@ -104,16 +104,20 @@ jobs:
 
     - name: Configure shell environment variables
       run: |
-        echo 'SWIG_DIR=/c/ProgramData/chocolatey/lib/swig/tools/install/swigwin-3.0.12' >> $GITHUB_ENV
-        echo 'JAVA_HOME=/c/hostedtoolcache/windows/jre/8.0.272/x64' >> $GITHUB_ENV
+        export SWIG_DIR=/c/ProgramData/chocolatey/lib/swig/tools/install/swigwin-3.0.12
+        export JAVA_HOME=/c/hostedtoolcache/windows/jre/8.0.272/x64
+        export CWD=`pwd`
+
+        echo "SWIG_DIR=$SWIG_DIR" >> $GITHUB_ENV
+        echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
         echo 'CMAKE_GENERATOR=Ninja' >> $GITHUB_ENV
         echo 'CC=gcc' >> $GITHUB_ENV
         echo 'CXX=g++' >> $GITHUB_ENV
         echo 'NO_TCMALLOC=On' >> $GITHUB_ENV
-        echo "PREFIX=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
+        echo "PREFIX=$CWD/install" >> $GITHUB_ENV
 
-        echo '/c/ProgramData/chocolatey/lib/swig/tools/install/swigwin-3.0.12' >> $GITHUB_PATH
-        echo '/c/hostedtoolcache/windows/jre/8.0.272/x64/bin' >> $GITHUB_PATH
+        echo "$SWIG_DIR" >> $GITHUB_PATH
+        echo "$JAVA_HOME/bin" >> $GITHUB_PATH
 
     - name: Show shell configuration
       run: |
@@ -207,24 +211,22 @@ jobs:
         make regression
 
         echo "***************************************************"
-        cat %GITHUB_WORKSPACE%/build/tests/ClassCons/ClassCons.log
+        cat %GITHUB_WORKSPACE%/build/tests/ClassCons/slpp_unit/surelog.log
         echo "***************************************************"
-        cat %GITHUB_WORKSPACE%/build/tests/DiffSimpleIncludeAndMacros/DiffSimpleIncludeAndMacros.log
+        cat %GITHUB_WORKSPACE%/build/tests/DiffSimpleIncludeAndMacros/slpp_unit/surelog.log
         echo "***************************************************"
-        cat %GITHUB_WORKSPACE%/build/tests/DiffSimpleIncludeAndMacros/DiffSimpleIncludeAndMacros.log
+        cat %GITHUB_WORKSPACE%/build/tests/SimpleParserTestCache/slpp_unit/surelog.log
         echo "***************************************************"
-        cat %GITHUB_WORKSPACE%/build/tests/SimpleParserTestCache/SimpleParserTestCache.log
+        cat %GITHUB_WORKSPACE%/build/tests/UVMNestedSeq/slpp_unit/surelog.log
         echo "***************************************************"
-        cat %GITHUB_WORKSPACE%/build/tests/UVMNestedSeq/UVMNestedSeq.log
+        cat %GITHUB_WORKSPACE%/build/tests/YosysCam/slpp_unit/surelog.log
         echo "***************************************************"
-        cat %GITHUB_WORKSPACE%/build/tests/YosysCam/YosysCam.log
+        cat %GITHUB_WORKSPACE%/build/tests/YosysDsp/slpp_unit/surelog.log
         echo "***************************************************"
-        cat %GITHUB_WORKSPACE%/build/tests/YosysDsp/YosysDsp.log
+        cat %GITHUB_WORKSPACE%/build/tests/YosysEth/slpp_unit/surelog.log
         echo "***************************************************"
-        cat %GITHUB_WORKSPACE%/build/tests/YosysEth/YosysEth.log
+        cat %GITHUB_WORKSPACE%/build/tests/YosysMarlann/slpp_unit/surelog.log
         echo "***************************************************"
-        cat %GITHUB_WORKSPACE%/build/tests/YosysMarlann/YosysMarlann.log
+        cat %GITHUB_WORKSPACE%/build/tests/YosysRiscv/slpp_unit/surelog.log
         echo "***************************************************"
-        cat %GITHUB_WORKSPACE%/build/tests/YosysRiscv/YosysRiscv.log
-        echo "***************************************************"
-        cat %GITHUB_WORKSPACE%/build/tests/YosysVerx/YosysVerx.log
+        cat %GITHUB_WORKSPACE%/build/tests/YosysVerx/slpp_unit/surelog.log
