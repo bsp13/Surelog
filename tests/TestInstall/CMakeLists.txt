@@ -21,9 +21,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+message("INSTALL_DIR = ${INSTALL_DIR}")
+
 # Python
 find_package(Python3 3.3 REQUIRED COMPONENTS Interpreter Development)
-include_directories(${Python3_INCLUDE_DIRS})
 message(STATUS "Python3_LIBRARIES = ${Python3_LIBRARIES}")
 message(STATUS "Python3_EXECUTABLE = ${Python3_EXECUTABLE}")
 message(STATUS "Python3_INCLUDE_DIRS = ${Python3_INCLUDE_DIRS}")
@@ -50,19 +51,16 @@ else()
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${TCMALLOC_COMPILE_OPTIONS} -Wall -O3 -DNDEBUG ${MY_CXX_WARNING_FLAGS}")
 endif()
 
-set (INCLUDE_DIR "${INSTALL_DIR}/include/surelog/")
-
-include_directories(${INCLUDE_DIR})
-include_directories("${INSTALL_DIR}/include/uhdm/")
-include_directories("${INSTALL_DIR}/include/uhdm/include/")
-
-set (LIB_DIR "${INSTALL_DIR}/lib/")
-
 add_executable(test_hellosureworld ${PROJECT_SOURCE_DIR}/../../src/hellosureworld.cpp)
-
+target_include_directories(
+  ${INSTALL_DIR}/include/surelog
+  ${INSTALL_DIR}/include/uhdm
+  ${INSTALL_DIR}/include/uhdm/include
+  ${Python3_INCLUDE_DIRS}
+)
 target_link_directories(test_hellosureworld
-    PRIVATE ${LIB_DIR}surelog/
-    PRIVATE ${LIB_DIR}uhdm/
+    PRIVATE ${INSTALL_DIR}/lib/surelog
+    PRIVATE ${INSTALL_DIR}/lib/uhdm
 )
 
 target_link_libraries(test_hellosureworld
@@ -97,6 +95,6 @@ if (WIN32)
 endif()
 
 add_custom_target(RunInstallTest ALL
-    DEPENDS test_hellosureworld
-    COMMAND $<TARGET_FILE:test_hellosureworld> --version
-    WORKING_DIRECTORY $<TARGET_FILE_DIR:test_hellosureworld>)
+  DEPENDS test_hellosureworld
+  COMMAND $<TARGET_FILE:test_hellosureworld> --version
+  WORKING_DIRECTORY $<TARGET_FILE_DIR:test_hellosureworld>)
