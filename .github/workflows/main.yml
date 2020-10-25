@@ -39,7 +39,7 @@ jobs:
       run: |
         echo 'CC=gcc-7' >> $GITHUB_ENV
         echo 'CXX=g++-7' >> $GITHUB_ENV
-        echo 'PREFIX=/usr/include' >> $GITHUB_ENV
+        echo 'PREFIX=/usr/local' >> $GITHUB_ENV
 
     - name: Show shell configuration
       run: |
