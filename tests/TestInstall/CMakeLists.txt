@@ -44,7 +44,7 @@ else()
   # C++ Compilation line
   if($<BOOL:${TCMALLOC_LIBRARY}>)
     set (TCMALLOC_COMPILE_OPTIONS "-fno-builtin-malloc -fno-builtin-calloc -fno-builtin-realloc -fno-builtin-free")
-  endif(TCMALLOC_LIBRARY)
+  endif($<BOOL:${TCMALLOC_LIBRARY}>)
 
   set(CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} ${TCMALLOC_COMPILE_OPTIONS} -Wall -O0 -g ${MY_CXX_WARNING_FLAGS}")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${TCMALLOC_COMPILE_OPTIONS} -Wall -O3 -DNDEBUG ${MY_CXX_WARNING_FLAGS}")
@@ -85,6 +85,15 @@ if (UNIX)
       rt
       pthread
   )
+endif()
+
+if (WIN32)
+  add_custom_command(
+    TARGET test_hellosureworld
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${Python3_RUNTIME_LIBRARY_DIRS}/python${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}$<$<CONFIG:Debug>:_d>.dll
+            $<TARGET_FILE_DIR:test_hellosureworld>)
 endif()
 
 add_custom_target(RunInstallTest ALL
