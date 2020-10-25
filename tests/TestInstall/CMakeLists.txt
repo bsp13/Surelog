@@ -52,7 +52,7 @@ else()
 endif()
 
 add_executable(test_hellosureworld ${PROJECT_SOURCE_DIR}/../../src/hellosureworld.cpp)
-target_include_directories(
+target_include_directories(test_hellosureworld PRIVATE
   ${INSTALL_DIR}/include/surelog
   ${INSTALL_DIR}/include/uhdm
   ${INSTALL_DIR}/include/uhdm/include
