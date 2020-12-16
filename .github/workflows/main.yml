@@ -100,18 +100,18 @@ jobs:
 
     - name: Build artifacts
       run: |
-        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=out/install/Debug -S . -B out/build/Debug
-        cmake --build out/build/Debug -j `nproc`
-        cmake --install out/build/Debug
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=out/install/gcc/Debug -S . -B out/build/gcc/Debug
+        cmake --build out/build/gcc/Debug -j `nproc`
+        cmake --install out/build/gcc/Debug
 
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=out/install/Release -S . -B out/build/Release
-        cmake --build out/build/Release -j `nproc`
-        cmake --install out/build/Release
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=out/install/gcc/Release -S . -B out/build/gcc/Release
+        cmake --build out/build/gcc/Release -j `nproc`
+        cmake --install out/build/gcc/Release
 
-    - name: Build
-      run: |
-        make release
-        sudo make install
+    #- name: Build
+    #  run: |
+    #    make release
+    #    sudo make install
 
     # - name: Test
     #   run: |
@@ -234,16 +234,16 @@ jobs:
         where python && python --version
         where ninja && ninja --version
 
-        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=out/install/Debug -S . -B out/build/Debug
-        cmake --build out/build/Debug -j %NUMBER_OF_PROCESSORS%
-        cmake --install out/build/Debug
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=out/install/msvc/Debug -S . -B out/build/msvc/Debug
+        cmake --build out/build/msvc/Debug -j %NUMBER_OF_PROCESSORS%
+        cmake --install out/build/msvc/Debug
 
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=out/install/Release -S . -B out/build/Release
-        cmake --build out/build/Release -j %NUMBER_OF_PROCESSORS%
-        cmake --install out/build/Release
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=out/install/msvc/Release -S . -B out/build/msvc/Release
+        cmake --build out/build/msvc/Release -j %NUMBER_OF_PROCESSORS%
+        cmake --install out/build/msvc/Release
 
-        make release
-        make install
+    #    make release
+    #    make install
     #     make test_install
     #     make test/unittest
     #     make regression
