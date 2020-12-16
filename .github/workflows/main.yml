@@ -81,9 +81,9 @@ jobs:
 
     - name: Configure shell
       run: |
-        echo 'CC=gcc-7' >> $GITHUB_ENV
-        echo 'CXX=g++-7' >> $GITHUB_ENV
-        echo 'PREFIX=/usr/local' >> $GITHUB_ENV
+        echo 'CC=gcc-9' >> $GITHUB_ENV
+        echo 'CXX=g++-9' >> $GITHUB_ENV
+    #   echo 'PREFIX=/usr/local' >> $GITHUB_ENV
 
     - name: Show shell configuration
       run: |
@@ -98,7 +98,7 @@ jobs:
         which $CC && $CC --version
         which $CXX && $CXX --version
 
-    - name: Build artifacts
+    - name: Build
       run: |
         cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=out/install/gcc/Debug -S . -B out/build/gcc/Debug
         cmake --build out/build/gcc/Debug -j `nproc`
@@ -117,7 +117,7 @@ jobs:
 
     - name: Upload archive to bucket
       run: |
-          cd out/install/gcc         
+          cd out/install/gcc
           tar czfp Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz .
           aws s3 cp Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz
 
@@ -198,7 +198,7 @@ jobs:
         path: third_party/UHDM/third_party/capnproto
         # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
 
-    - name: Build & Test
+    - name: Build
       run: |
         call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
@@ -229,7 +229,7 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=out/install/msvc/Release -S . -B out/build/msvc/Release
         cmake --build out/build/msvc/Release -j %NUMBER_OF_PROCESSORS%
         cmake --install out/build/msvc/Release
-#
+
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -239,7 +239,7 @@ jobs:
 
     - name: Upload archive to bucket
       run: |
-          cd out/install/msvc          
+          cd out/install/msvc
           tar czfp Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz .
           aws s3 cp Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz
 
