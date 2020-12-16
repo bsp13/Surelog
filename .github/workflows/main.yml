@@ -83,7 +83,7 @@ jobs:
       run: |
         echo 'CC=gcc-9' >> $GITHUB_ENV
         echo 'CXX=g++-9' >> $GITHUB_ENV
-    #   echo 'PREFIX=/usr/local' >> $GITHUB_ENV
+        echo 'PREFIX=/usr/local' >> $GITHUB_ENV
 
     - name: Show shell configuration
       run: |
@@ -166,6 +166,12 @@ jobs:
 
     - name: Git Pull
       uses: actions/checkout@v2
+
+    - name: Configure shell
+      run: |
+        echo 'CC=cl' >> $GITHUB_ENV
+        echo 'CXX=cl' >> $GITHUB_ENV
+      shell: bash  
 
     - name: Pull UHDM
       uses: actions/checkout@v2
