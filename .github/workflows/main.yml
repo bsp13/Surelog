@@ -107,17 +107,6 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=out/install/gcc/Release -S . -B out/build/gcc/Release
         cmake --build out/build/gcc/Release -j `nproc`
         cmake --install out/build/gcc/Release
-
-    #- name: Build
-    #  run: |
-    #    make release
-    #    sudo make install
-
-    # - name: Test
-    #   run: |
-    #     make test_install
-    #     make test/unittest
-    #     make regression
     
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -128,8 +117,7 @@ jobs:
 
     - name: Upload archive to bucket
       run: |
-          cd out/install/gcc
-          ls -ltr
+          cd out/install/gcc         
           tar czfp Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz .
           aws s3 cp Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz
 
@@ -241,12 +229,6 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=out/install/msvc/Release -S . -B out/build/msvc/Release
         cmake --build out/build/msvc/Release -j %NUMBER_OF_PROCESSORS%
         cmake --install out/build/msvc/Release
-
-    #    make release
-    #    make install
-    #     make test_install
-    #     make test/unittest
-    #     make regression
 #
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -257,8 +239,7 @@ jobs:
 
     - name: Upload archive to bucket
       run: |
-          cd out/install/msvc
-          ls -ltr
+          cd out/install/msvc          
           tar czfp Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz .
           aws s3 cp Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz
 
