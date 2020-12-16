@@ -5,8 +5,9 @@ on:
   pull_request:
 
 jobs:
-  linux:
+  bionic-gcc:
     runs-on: ubuntu-latest
+
     defaults:
       run:
         shell: bash
@@ -30,10 +31,53 @@ jobs:
       with:
         python-version: 3.8
 
-    - uses: actions/checkout@v2
+    - name: Get top commit details
+      uses: actions/github-script@0.3.0
+      id: author-date
       with:
-        submodules: recursive
-        fetch-depth: 0
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const commit_details = await github.git.getCommit({ owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha });
+          return commit_details.data.author.date
+
+    - name: Retrieve date
+      run: |
+        echo "COMMITTED_AT=$(date -d ${{ steps.author-date.outputs.result }} +'%Y.%m.%d_%H.%M.%S')" >> $GITHUB_ENV
+        echo ${{ env.COMMITTED_AT }}
+
+    - name: Git Pull
+      uses: actions/checkout@v2
+
+    - name: Pull UHDM
+      uses: actions/checkout@v2
+      with:
+        repository: bsp13/UHDM
+        lfs: false
+        path: third_party/UHDM
+        # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
+
+    - name: Pull flatbuffers
+      uses: actions/checkout@v2
+      with:
+        repository: bsp13/flatbuffers
+        lfs: false
+        path: third_party/flatbuffers
+        # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
+
+    - name: Pull googletest
+      uses: actions/checkout@v2
+      with:
+        repository: google/googletest
+        lfs: false
+        path: third_party/googletest
+
+    - name: Pull capnproto
+      uses: actions/checkout@v2
+      with:
+        repository: bsp13/capnproto
+        lfs: false
+        path: third_party/UHDM/third_party/capnproto
+        # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
 
     - name: Configure shell
       run: |
@@ -54,98 +98,40 @@ jobs:
         which $CC && $CC --version
         which $CXX && $CXX --version
 
+    - name: Build artifacts
+      run: |
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=out/install/Debug -S . -B out/build/Debug
+        cmake --build out/build/Debug -j `nproc`
+        cmake --install out/build/Debug
+
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=out/install/Release -S . -B out/build/Release
+        cmake --build out/build/Release -j `nproc`
+        cmake --install out/build/Release
+
     - name: Build
       run: |
         make release
         sudo make install
 
-    - name: Test
-      run: |
-        make test_install
-        make test/unittest
-        make regression
-
-  msys2-gcc:
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
-
-    steps:
-    - name: Install core dependencies
-      run: choco install -y swig --version=3.0.12
-      shell: powershell
-
-    - name: Setup Java
-      uses: actions/setup-java@v1
+    # - name: Test
+    #   run: |
+    #     make test_install
+    #     make test/unittest
+    #     make regression
+    
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        java-version: 1.8
-        java-package: jre
-        architecture: x64
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-1
 
-    - name: Setup Msys2
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: MSYS
-        update: true
-        install: make cmake ninja python python-devel gcc
-      env:
-        MSYS2_PATH_TYPE: inherit
-
-    - name: Configure Git
-      run: git config --global core.autocrlf input
-      shell: bash
-
-    - name: Git pull
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
-        fetch-depth: 0
-
-    - name: Configure shell environment variables
+    - name: Upload archive to bucket
       run: |
-        export SWIG_DIR=/c/ProgramData/chocolatey/lib/swig/tools/install/swigwin-3.0.12
-        export JAVA_HOME=`cygpath -u $JAVA_HOME_8_0_275_X64`
-        export CWD=`pwd`
-
-        echo "SWIG_DIR=$SWIG_DIR" >> $GITHUB_ENV
-        echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
-        echo 'CMAKE_GENERATOR=Ninja' >> $GITHUB_ENV
-        echo 'CC=gcc' >> $GITHUB_ENV
-        echo 'CXX=g++' >> $GITHUB_ENV
-        echo 'NO_TCMALLOC=On' >> $GITHUB_ENV
-        echo "PREFIX=$CWD/install" >> $GITHUB_ENV
-
-        echo "$SWIG_DIR" >> $GITHUB_PATH
-        echo "$JAVA_HOME/bin" >> $GITHUB_PATH
-
-    - name: Show shell configuration
-      run: |
-        export PATH=$SWIG_DIR:$JAVA_HOME/bin:$PATH
-        export PATH=$SWIG_DIR:$PATH
-        env
-        where cmake && cmake --version
-        where make && make --version
-        where swig && swig -version
-        where java && java -version
-        where python && python --version
-        where ninja && ninja --version
-        where tclsh && echo 'puts [info patchlevel];exit 0' | tclsh
-        where $CC && $CC --version
-        where $CXX && $CXX --version
-
-    - name: Build
-      run: |
-        export PATH=$SWIG_DIR:$JAVA_HOME/bin:$PATH
-        make release
-        make install
-
-    - name: Test
-      run: |
-        export PATH=$SWIG_DIR:$JAVA_HOME/bin:$PATH
-        make test_install
-        make test/unittest
-        make regression
+          cd out/install/gcc
+          ls -ltr
+          tar czfp Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz .
+          aws s3 cp Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz
 
   windows-msvc:
     runs-on: windows-latest
@@ -176,10 +162,53 @@ jobs:
     - run: git config --global core.autocrlf input
       shell: bash
 
-    - uses: actions/checkout@v2
+    - name: Get top commit details
+      uses: actions/github-script@0.3.0
+      id: author-date
       with:
-        submodules: recursive
-        fetch-depth: 0
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const commit_details = await github.git.getCommit({ owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha });
+          return commit_details.data.author.date
+
+    - name: Retrieve date
+      run: |
+        echo "COMMITTED_AT=$(date -d ${{ steps.author-date.outputs.result }} +'%Y.%m.%d_%H.%M.%S')" >> $GITHUB_ENV
+        echo ${{ env.COMMITTED_AT }}
+
+    - name: Git Pull
+      uses: actions/checkout@v2
+
+    - name: Pull UHDM
+      uses: actions/checkout@v2
+      with:
+        repository: bsp13/UHDM
+        lfs: false
+        path: third_party/UHDM
+        # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
+
+    - name: Pull flatbuffers
+      uses: actions/checkout@v2
+      with:
+        repository: bsp13/flatbuffers
+        lfs: false
+        path: third_party/flatbuffers
+        # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
+
+    - name: Pull googletest
+      uses: actions/checkout@v2
+      with:
+        repository: google/googletest
+        lfs: false
+        path: third_party/googletest
+
+    - name: Pull capnproto
+      uses: actions/checkout@v2
+      with:
+        repository: bsp13/capnproto
+        lfs: false
+        path: third_party/UHDM/third_party/capnproto
+        # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
 
     - name: Build & Test
       run: |
@@ -205,8 +234,32 @@ jobs:
         where python && python --version
         where ninja && ninja --version
 
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=out/install/Debug -S . -B out/build/Debug
+        cmake --build out/build/Debug -j %NUMBER_OF_PROCESSORS%
+        cmake --install out/build/Debug
+
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=out/install/Release -S . -B out/build/Release
+        cmake --build out/build/Release -j %NUMBER_OF_PROCESSORS%
+        cmake --install out/build/Release
+
         make release
         make install
-        make test_install
-        make test/unittest
-        make regression
+    #     make test_install
+    #     make test/unittest
+    #     make regression
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-1
+
+    - name: Upload archive to bucket
+      run: |
+          cd out/install/msvc
+          ls -ltr
+          tar czfp Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz .
+          aws s3 cp Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz
+
+
