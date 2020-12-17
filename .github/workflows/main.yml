@@ -232,7 +232,7 @@ jobs:
     - name: Upload archive to bucket
       run: |
           cd out/install/gcc          
-          tar czfp Surelog_bionic-gcc_Release_${{ env.COMMITTED_AT }}.tgz Release          
+          tar czfp Surelog_bionic-gcc_Release_${{ env.COMMITTED_AT }}.tgz Release
           aws s3 cp Surelog_bionic-gcc_Release_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_bionic-gcc_Release_${{ env.COMMITTED_AT }}.tgz      
 
   if: false
@@ -358,7 +358,7 @@ jobs:
       - name: Upload archive to bucket
         run: |
             cd out/install/msvc          
-            tar czfp Surelog_windows-msvc_Debug_${{ env.COMMITTED_AT }}.tgz Debug          
+            tar czfp Surelog_windows-msvc_Debug_${{ env.COMMITTED_AT }}.tgz Debug
             aws s3 cp Surelog_windows-msvc_Debug_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_windows-msvc_Debug_${{ env.COMMITTED_AT }}.tgz
 
   windows-msvc-release:
@@ -483,6 +483,6 @@ jobs:
     - name: Upload archive to bucket
       run: |
           cd out/install/msvc          
-          tar czfp Surelog_windows-msvc_Release_${{ env.COMMITTED_AT }}.tgz Release          
+          tar czfp Surelog_windows-msvc_Release_${{ env.COMMITTED_AT }}.tgz Release
           aws s3 cp Surelog_windows-msvc_Release_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_windows-msvc_Release_${{ env.COMMITTED_AT }}.tgz    
 
