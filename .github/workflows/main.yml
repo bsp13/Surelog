@@ -125,7 +125,7 @@ jobs:
           cd out/install/gcc          
           tar czfp Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz .
           ls -ltr
-          aws s3 cp Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz
+        #  aws s3 cp Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz
 
   windows-msvc:
     runs-on: windows-latest
@@ -259,5 +259,5 @@ jobs:
           cd out/install/msvc          
           tar czfp Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz .
           ls -ltr
-          aws s3 cp Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz
+        # aws s3 cp Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz
 
