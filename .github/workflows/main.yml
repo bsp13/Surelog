@@ -115,10 +115,16 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-west-1
 
+    - name: Retrieve Job
+      run: |
+        echo "GITHUB_JOB=$(Debug)" >> $GITHUB_ENV
+        echo ${{ env.GITHUB_JOB }}
+
     - name: Upload archive to bucket
       run: |
-          cd out/install/gcc
+          cd out/install/gcc          
           tar czfp Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz .
+          ls -ltr
           aws s3 cp Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_bionic-gcc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz
 
   windows-msvc:
@@ -243,10 +249,15 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-west-1
 
+    - name: Retrieve Job
+      run: |
+        echo "GITHUB_JOB=$(Debug)" >> $GITHUB_ENV
+        echo ${{ env.GITHUB_JOB }}    
+
     - name: Upload archive to bucket
       run: |
-          cd out/install/msvc
+          cd out/install/msvc          
           tar czfp Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz .
+          ls -ltr
           aws s3 cp Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_windows-msvc_${{ env.GITHUB_JOB }}_${{ env.COMMITTED_AT }}.tgz
-
 
