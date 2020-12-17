@@ -83,7 +83,6 @@ jobs:
       run: |
         echo 'CC=gcc-9' >> $GITHUB_ENV
         echo 'CXX=g++-9' >> $GITHUB_ENV
-        echo 'PREFIX=/usr/local' >> $GITHUB_ENV
 
     - name: Show shell configuration
       run: |
@@ -119,8 +118,7 @@ jobs:
     - name: Upload archive to bucket
       run: |
           cd out/install/gcc          
-          tar czfp Surelog_bionic-gcc_Debug_${{ env.COMMITTED_AT }}.tgz Debug
-          ls -ltr
+          tar czfp Surelog_bionic-gcc_Debug_${{ env.COMMITTED_AT }}.tgz Debug          
           aws s3 cp Surelog_bionic-gcc_Debug_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_bionic-gcc_Debug_${{ env.COMMITTED_AT }}.tgz
 
   bionic-gcc-release:
