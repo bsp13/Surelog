@@ -232,134 +232,134 @@ jobs:
     - name: Upload archive to bucket
       run: |
           cd out/install/gcc          
-          tar czfp Surelog_bionic-gcc_Release_${{ env.COMMITTED_AT }}.tgz Release
+          tar czfp Surelog_bionic-gcc_Release_${{ env.COMMITTED_AT }}.tgz Release          
           aws s3 cp Surelog_bionic-gcc_Release_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_bionic-gcc_Release_${{ env.COMMITTED_AT }}.tgz      
 
-  if: false
-    windows-msvc-debug:
-      runs-on: windows-latest
+  windows-msvc-debug:
+    if : false
+    runs-on: windows-latest
 
-      defaults:
-        run:
-          shell: cmd
+    defaults:
+      run:
+        shell: cmd
 
-      steps:
-      - name: Install Core Dependencies
-        run: |
-          choco install -y make
-          choco install -y swig --version=3.0.12
+    steps:
+    - name: Install Core Dependencies
+      run: |
+        choco install -y make
+        choco install -y swig --version=3.0.12
 
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-          architecture: x64
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+        architecture: x64
 
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.8
-          java-package: jre
-          architecture: x64
+    - name: Setup Java
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        java-package: jre
+        architecture: x64
 
-      - run: git config --global core.autocrlf input
-        shell: bash
+    - run: git config --global core.autocrlf input
+      shell: bash
 
-      - name: Get top commit details
-        uses: actions/github-script@0.3.0
-        id: author-date
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const commit_details = await github.git.getCommit({ owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha });
-            return commit_details.data.author.date
+    - name: Get top commit details
+      uses: actions/github-script@0.3.0
+      id: author-date
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const commit_details = await github.git.getCommit({ owner: context.repo.owner, repo: context.repo.repo, commit_sha: context.sha });
+          return commit_details.data.author.date
 
-      - name: Retrieve date
-        run: |
-          echo "COMMITTED_AT=$(date -d ${{ steps.author-date.outputs.result }} +'%Y.%m.%d_%H.%M.%S')" >> $GITHUB_ENV
-          echo ${{ env.COMMITTED_AT }}
-        shell : bash
+    - name: Retrieve date
+      run: |
+        echo "COMMITTED_AT=$(date -d ${{ steps.author-date.outputs.result }} +'%Y.%m.%d_%H.%M.%S')" >> $GITHUB_ENV
+        echo ${{ env.COMMITTED_AT }}
+      shell : bash
 
-      - name: Git Pull
-        uses: actions/checkout@v2
+    - name: Git Pull
+      uses: actions/checkout@v2
 
-      - name: Configure shell
-        run: |
-          echo 'CC=cl' >> $GITHUB_ENV
-          echo 'CXX=cl' >> $GITHUB_ENV
-        shell: bash  
+    - name: Configure shell
+      run: |
+        echo 'CC=cl' >> $GITHUB_ENV
+        echo 'CXX=cl' >> $GITHUB_ENV
+      shell: bash  
 
-      - name: Pull UHDM
-        uses: actions/checkout@v2
-        with:
-          repository: bsp13/UHDM
-          lfs: false
-          path: third_party/UHDM
-          # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
+    - name: Pull UHDM
+      uses: actions/checkout@v2
+      with:
+        repository: bsp13/UHDM
+        lfs: false
+        path: third_party/UHDM
+        # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
 
-      - name: Pull flatbuffers
-        uses: actions/checkout@v2
-        with:
-          repository: bsp13/flatbuffers
-          lfs: false
-          path: third_party/flatbuffers
-          # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
+    - name: Pull flatbuffers
+      uses: actions/checkout@v2
+      with:
+        repository: bsp13/flatbuffers
+        lfs: false
+        path: third_party/flatbuffers
+        # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
 
-      - name: Pull googletest
-        uses: actions/checkout@v2
-        with:
-          repository: google/googletest
-          lfs: false
-          path: third_party/googletest
+    - name: Pull googletest
+      uses: actions/checkout@v2
+      with:
+        repository: google/googletest
+        lfs: false
+        path: third_party/googletest
 
-      - name: Pull capnproto
-        uses: actions/checkout@v2
-        with:
-          repository: bsp13/capnproto
-          lfs: false
-          path: third_party/UHDM/third_party/capnproto
-          # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
+    - name: Pull capnproto
+      uses: actions/checkout@v2
+      with:
+        repository: bsp13/capnproto
+        lfs: false
+        path: third_party/UHDM/third_party/capnproto
+        # token: ${{ secrets.GHA_DAVENCHE_CI_TOKEN }}
 
-      - name: Build
-        run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+    - name: Build
+      run: |
+        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
 
-          set CMAKE_GENERATOR=Ninja
-          set CC=cl
-          set CXX=cl
-          set NO_TCMALLOC=On
-          set PREFIX=%GITHUB_WORKSPACE%\install
-          set CPU_CORES=%NUMBER_OF_PROCESSORS%
+        set CMAKE_GENERATOR=Ninja
+        set CC=cl
+        set CXX=cl
+        set NO_TCMALLOC=On
+        set PREFIX=%GITHUB_WORKSPACE%\install
+        set CPU_CORES=%NUMBER_OF_PROCESSORS%
 
-          set MAKE_DIR=C:\make\bin
-          set TCL_DIR=%PROGRAMFILES%\Git\mingw64\bin
-          set SWIG_DIR=%PROGRMDATA%\chocolatey\lib\swig\tools\install\swigwin-3.0.12
-          set PATH=%pythonLocation%;%SWIG_DIR%;%JAVA_HOME%\bin;%MAKE_DIR%;%TCL_DIR%;%PATH%
+        set MAKE_DIR=C:\make\bin
+        set TCL_DIR=%PROGRAMFILES%\Git\mingw64\bin
+        set SWIG_DIR=%PROGRMDATA%\chocolatey\lib\swig\tools\install\swigwin-3.0.12
+        set PATH=%pythonLocation%;%SWIG_DIR%;%JAVA_HOME%\bin;%MAKE_DIR%;%TCL_DIR%;%PATH%
 
-          set
-          where cmake && cmake --version
-          where make && make --version
-          where swig && swig -version
-          where java && java -version
-          where python && python --version
-          where ninja && ninja --version
+        set
+        where cmake && cmake --version
+        where make && make --version
+        where swig && swig -version
+        where java && java -version
+        where python && python --version
+        where ninja && ninja --version
 
-          cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=out/install/msvc/Debug -S . -B out/build/msvc/Debug
-          cmake --build out/build/msvc/Debug -j %NUMBER_OF_PROCESSORS%
-          cmake --install out/build/msvc/Debug      
+        cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=out/install/msvc/Debug -S . -B out/build/msvc/Debug
+        cmake --build out/build/msvc/Debug -j %NUMBER_OF_PROCESSORS%
+        cmake --install out/build/msvc/Debug      
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-1  
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-1  
 
-      - name: Upload archive to bucket
-        run: |
-            cd out/install/msvc          
-            tar czfp Surelog_windows-msvc_Debug_${{ env.COMMITTED_AT }}.tgz Debug
-            aws s3 cp Surelog_windows-msvc_Debug_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_windows-msvc_Debug_${{ env.COMMITTED_AT }}.tgz
+    - name: Upload archive to bucket
+      run: |
+          cd out/install/msvc          
+          tar czfp Surelog_windows-msvc_Debug_${{ env.COMMITTED_AT }}.tgz Debug          
+          aws s3 cp Surelog_windows-msvc_Debug_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_windows-msvc_Debug_${{ env.COMMITTED_AT }}.tgz
 
   windows-msvc-release:
     runs-on: windows-latest
@@ -483,6 +483,6 @@ jobs:
     - name: Upload archive to bucket
       run: |
           cd out/install/msvc          
-          tar czfp Surelog_windows-msvc_Release_${{ env.COMMITTED_AT }}.tgz Release
+          tar czfp Surelog_windows-msvc_Release_${{ env.COMMITTED_AT }}.tgz Release          
           aws s3 cp Surelog_windows-msvc_Release_${{ env.COMMITTED_AT }}.tgz s3://davenche-bin/Surelog_windows-msvc_Release_${{ env.COMMITTED_AT }}.tgz    
 
